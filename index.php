@@ -14,6 +14,12 @@ spl_autoload_register('loader');
 
 $app = new \yzf\Yzf();
 
+$app->before(function(){
+   echo 'head';
+});
+$app->after(function () {
+   echo 'foot';
+});
 
 $app->map('GET','/a/b',function(){
     echo 'a/b';

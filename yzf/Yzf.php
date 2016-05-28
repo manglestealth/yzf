@@ -16,11 +16,17 @@ class Yzf
 
     private $method;
 
+    private $before;
+
+    private $after;
+
     public function __construct()
     {
         $this->request = new Request();
         $this->response = new Response();
         $this->router = new Router($this->request);
+        $this->before = array();
+        $this->after = array();
     }
 
     public function map($method, $pattern, $callable)
@@ -71,10 +77,9 @@ class Yzf
 
     public function run()
     {
-        //TODO::middleware
+        $this->runCallables( $this->before );
         ob_start();
         if(!$this->router->dispatch()){
-            ob_start();
             $notFoundCallable = $this->router->notFound();
             $notFoundCallable();
             $notFound = ob_get_clean();
@@ -83,5 +88,18 @@ class Yzf
         $this->response->write(ob_get_contents());
         ob_end_clean();
         $this->response->send();
+        $this->runCallables( $this->after );
+
     }
+
+    public function before( $callable )
+    {
+        $this->before[] = $callable;
+    }
+
+    public function after( $callable )
+    {
+        $this->after[] = $callable;
+    }
+    
 }
